@@ -33,15 +33,16 @@ All configuration files in the `defaults/` directory are automatically loaded by
 ## Table of Contents
 
 1. [Base Configuration](#base-configuration)
-2. [Network Configuration](#network-configuration)
-3. [Hardware Configuration](#hardware-configuration)
-4. [Discovery Hosts Configuration](#discovery-hosts-configuration)
-5. [Registry Configuration](#registry-configuration)
-6. [Storage Configuration](#storage-configuration)
-7. [SSL Certificate Configuration](#ssl-certificate-configuration)
-8. [Operator Configuration](#operator-configuration)
-9. [Content Configuration](#content-configuration)
-10. [Complete Example](#complete-example)
+2. [SSH Public Key Configuration](#ssh-public-key-configuration)
+3. [Network Configuration](#network-configuration)
+4. [Hardware Configuration](#hardware-configuration)
+5. [Discovery Hosts Configuration](#discovery-hosts-configuration)
+6. [Registry Configuration](#registry-configuration)
+7. [Storage Configuration](#storage-configuration)
+8. [SSL Certificate Configuration](#ssl-certificate-configuration)
+9. [Operator Configuration](#operator-configuration)
+10. [Content Configuration](#content-configuration)
+11. [Complete Example](#complete-example)
 
 ## Base Configuration
 
@@ -64,6 +65,41 @@ workingDir: "/home/enclave"
   - Cluster configuration (`{{ workingDir }}/ocp-cluster/`)
   - Registry data (`{{ workingDir }}/data/`)
   - Pull secrets (`{{ workingDir }}/config/pull-secret.json`)
+
+## SSH Public Key Configuration
+
+An SSH public key is required for accessing cluster nodes. You must provide **one** of the following:
+
+### `sshPubKey`
+
+**Description**: SSH public key content as a string. When set, this takes precedence over `sshPubPath`. The key content is written to `{{ workingDir }}/config/ssh-pub-key.pub` at runtime and `sshPubPath` is set automatically.
+
+**Type**: String
+
+**Example**:
+```yaml
+sshPubKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7... user@host"
+```
+
+**Notes**:
+- Useful for the wizard, where the user can paste the key content directly instead of having to provide a file path on the remote host
+- If both `sshPubKey` and `sshPubPath` are set, `sshPubKey` overrides `sshPubPath`
+- The key must be in standard OpenSSH format (e.g. `ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`)
+
+### `sshPubPath`
+
+**Description**: Path to the SSH public key file on the deployment host.
+
+**Type**: String (file path)
+
+**Example**:
+```yaml
+sshPubPath: "{{ workingDir }}/.ssh/id_rsa.pub"
+```
+
+**Notes**:
+- The file must exist and be readable at deployment time
+- Not required when `sshPubKey` is set
 
 ## Network Configuration
 
@@ -1290,9 +1326,14 @@ lzBmcIP: 100.64.1.10
 #  - YOUR_NTP_SERVER_1
 #  - YOUR_NTP_SERVER_2
 
-# Pull Secret and SSH Public Key
+# Pull Secret
 pullSecret: '{"auths":{"cloud.openshift.com":{...},"quay.io":{...}}}'
 # pullSecretPath: "{{ workingDir }}/config/pull-secret.json"  # Default
+
+# SSH Public Key (provide one of the two options)
+# Option 1: Key content directly (useful for the wizard, avoids dealing with file paths on the remote host)
+# sshPubKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7... user@host"
+# Option 2: Path to key file
 sshPubPath: "{{ workingDir }}/.ssh/id_rsa.pub"
 
 # Storage Plugin
