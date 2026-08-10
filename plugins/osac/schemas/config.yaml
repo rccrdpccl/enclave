@@ -132,6 +132,18 @@ properties:
   osacNetrisSshBastionKey:
     type: string
     description: "SSH private key for bastion host access"
+  osacDnsEnabled:
+    type: boolean
+    description: "Enable Route53 DNS backend for CaaS cluster fulfillment"
+  osacDnsAwsAccessKeyId:
+    type: string
+    description: "AWS access key ID for Route53 DNS management"
+  osacDnsAwsSecretAccessKey:
+    type: string
+    description: "AWS secret access key for Route53 DNS management"
+  osacDnsZone:
+    type: string
+    description: "Route53 hosted zone name (defaults to base domain if unset)"
 required:
   - osacAapLicenseFile
 dependencies:
@@ -139,17 +151,32 @@ dependencies:
     - osacNetrisAwsSecretAccessKey
   osacNetrisAwsSecretAccessKey:
     - osacNetrisAwsAccessKeyId
-if:
-  required:
-    - osacNetrisEnabled
-  properties:
-    osacNetrisEnabled:
-      const: true
-then:
-  required:
-    - osacNetrisControllerUrl
-    - osacNetrisUsername
-    - osacNetrisPassword
-    - osacNetrisSiteId
-    - osacNetrisTenantId
-    - osacNetrisTenantName
+  osacDnsAwsAccessKeyId:
+    - osacDnsAwsSecretAccessKey
+  osacDnsAwsSecretAccessKey:
+    - osacDnsAwsAccessKeyId
+allOf:
+  - if:
+      required:
+        - osacNetrisEnabled
+      properties:
+        osacNetrisEnabled:
+          const: true
+    then:
+      required:
+        - osacNetrisControllerUrl
+        - osacNetrisUsername
+        - osacNetrisPassword
+        - osacNetrisSiteId
+        - osacNetrisTenantId
+        - osacNetrisTenantName
+  - if:
+      required:
+        - osacDnsEnabled
+      properties:
+        osacDnsEnabled:
+          const: true
+    then:
+      required:
+        - osacDnsAwsAccessKeyId
+        - osacDnsAwsSecretAccessKey

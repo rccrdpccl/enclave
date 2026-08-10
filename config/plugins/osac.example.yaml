@@ -34,6 +34,14 @@
 #   aap_bootstrap: "ghcr.io/osac-project/osac-aap:v0.0.4"
 #   cli: "quay.io/openshift/origin-cli:4.20.0"
 
+# --- Route53 DNS Backend ---
+# Enable Route53 DNS for CaaS cluster fulfillment.
+# Provides DNS record management for provisioned clusters.
+# osacDnsEnabled: true
+# osacDnsAwsAccessKeyId: "AKIA..."
+# osacDnsAwsSecretAccessKey: ""
+# osacDnsZone: "example.com"   # Optional: defaults to base domain if unset
+
 # --- Netris Network Backend ---
 # Enable Netris integration for cluster and network fulfillment.
 # Requires a pre-deployed Netris controller (see Netris + OSAC Prerequisites Guide).

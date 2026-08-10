@@ -1,0 +1,8 @@
+---
+osacAapLicenseFile: "/home/cloud-user/aap-license.zip"
+osacProfilesList:
+  - caas
+osacDnsEnabled: true
+osacDnsAwsAccessKeyId: "AKIAIOSFODNN7EXAMPLE"
+osacDnsAwsSecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+osacDnsZone: "example.com"

@@ -130,10 +130,19 @@ dbMigrate:
 validation:
   enabled: true
 
-{% if osacNetrisEnabled | default(false) | bool %}
+{% set _dns_enabled = osacDnsEnabled | default(false) | bool %}
+{% set _netris_enabled = osacNetrisEnabled | default(false) | bool %}
+{% if _netris_enabled or _dns_enabled %}
 clusterFulfillment:
   enabled: true
   config:
+{% if _dns_enabled %}
+    DNS_CLASS: "dns.route53.dns"
+{% if osacDnsZone is defined %}
+    DNS_ZONE: "{{ osacDnsZone }}"
+{% endif %}
+{% endif %}
+{% if _netris_enabled %}
     NETWORK_CLASS: "netris"
     NETWORK_STEPS_COLLECTION: "{{ osacNetrisStepsCollection | default('netris.steps') }}"
     NETRIS_CONTROLLER_URL: "{{ osacNetrisControllerUrl }}"
@@ -183,12 +192,18 @@ clusterFulfillment:
 {% if osacNetrisHostedClusterInfrastructureAvailabilityPolicy is defined %}
     HOSTED_CLUSTER_INFRASTRUCTURE_AVAILABILITY_POLICY: "{{ osacNetrisHostedClusterInfrastructureAvailabilityPolicy }}"
 {% endif %}
+{% endif %}
   secret:
+{% if _dns_enabled %}
+    AWS_ACCESS_KEY_ID: "{{ osacDnsAwsAccessKeyId }}"
+    AWS_SECRET_ACCESS_KEY: "{{ osacDnsAwsSecretAccessKey }}"
+{% endif %}
+{% if _netris_enabled %}
     NETRIS_PASSWORD: "{{ osacNetrisPassword }}"
-{% if osacNetrisAwsAccessKeyId is defined %}
+{% if not _dns_enabled and osacNetrisAwsAccessKeyId is defined %}
     AWS_ACCESS_KEY_ID: "{{ osacNetrisAwsAccessKeyId }}"
 {% endif %}
-{% if osacNetrisAwsSecretAccessKey is defined %}
+{% if not _dns_enabled and osacNetrisAwsSecretAccessKey is defined %}
     AWS_SECRET_ACCESS_KEY: "{{ osacNetrisAwsSecretAccessKey }}"
 {% endif %}
 {% if osacNetrisSshKey is defined %}
@@ -197,6 +212,8 @@ clusterFulfillment:
 {% if osacNetrisSshBastionKey is defined %}
     SERVER_SSH_BASTION_KEY: "{{ osacNetrisSshBastionKey }}"
 {% endif %}
+{% endif %}
+{% if _netris_enabled %}
 
 networkFulfillment:
   enabled: true
@@ -208,4 +225,5 @@ networkFulfillment:
     NETRIS_TENANT_NAME: "{{ osacNetrisTenantName }}"
   secret:
     NETRIS_PASSWORD: "{{ osacNetrisPassword }}"
+{% endif %}
 {% endif %}
